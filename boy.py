@@ -10,8 +10,8 @@ from ball import Ball
 
 import game_framework
 
-import os
-path = os.getcwd() + '\\Labs\\LEC16_Time\\'
+from pathlib import Path
+path = str(Path(__file__).resolve().parent) + '/'
 
 class Idle:
     def enter(self, boy):

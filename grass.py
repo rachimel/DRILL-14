@@ -1,7 +1,7 @@
 from pico2d import *
 
-import os
-path = os.getcwd() + '\\Labs\\LEC16_Time\\'
+from pathlib import Path
+path = str(Path(__file__).resolve().parent) + '/'
 
 class Grass:
     def __init__(self):
