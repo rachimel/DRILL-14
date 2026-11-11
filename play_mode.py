@@ -26,6 +26,8 @@ def handle_events():
 def init():
     global boy, birds
 
+    game_world.clear()
+    birds.clear()
     boy = Boy()
     game_world.add_oject(boy)
 
@@ -55,10 +57,11 @@ def resume():
 
 
 def finish():
-    global boy, birds
+    global boy
     game_world.clear()
+    birds.clear()
+    Bird.image = None
     boy = None
-birds = []
 
 
 def update():
