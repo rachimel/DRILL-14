@@ -49,7 +49,12 @@ class Bird:
         return cls.image
 
     def update(self):
-        pass
+        dt = game_framework.frame_time
+        if not isfinite(dt) or dt < 0:
+            raise ValueError('frame_time은 유한한 0 이상의 초 단위 값이어야 한다.')
+        if dt == 0:
+            return
+        self.x += self.direction * FLY_SPEED_PPS * dt
 
     def draw(self):
         image = self.load_shared_image()
