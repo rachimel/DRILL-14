@@ -41,6 +41,10 @@ class Bird:
         self.frame = float(frame)
         self.left = DRAW_WIDTH / 2
         self.right = canvas_width - DRAW_WIDTH / 2
+        if self.right <= self.left:
+            raise ValueError('캔버스 폭이 새의 출력 폭보다 커야 한다.')
+        if not self.left <= self.x <= self.right or direction not in (-1, 1):
+            raise ValueError('초기 수평 위치와 방향을 확인해야 한다.')
 
     @classmethod
     def load_shared_image(cls):
@@ -54,14 +58,22 @@ class Bird:
             raise ValueError('frame_time은 유한한 0 이상의 초 단위 값이어야 한다.')
         if dt == 0:
             return
-        self.x += self.direction * FLY_SPEED_PPS * dt
-        while self.x < self.left or self.x > self.right:
-            if self.x > self.right:
-                self.x = 2 * self.right - self.x
-                self.direction = -1
-            elif self.x < self.left:
-                self.x = 2 * self.left - self.x
-                self.direction = 1
+        # 왕복 경로를 펼쳐 계산하면 큰 dt의 다중 반사도 한 번에 처리된다.
+        span = self.right - self.left
+        offset = self.x - self.left
+        unfolded = offset if self.direction == 1 else 2 * span - offset
+        position = (unfolded + FLY_SPEED_PPS * dt) % (2 * span)
+        if isclose(position, 0, rel_tol=0, abs_tol=1e-9) or isclose(
+                position, 2 * span, rel_tol=0, abs_tol=1e-9):
+            position = 0.0
+        elif isclose(position, span, rel_tol=0, abs_tol=1e-9):
+            position = span
+        if position < span:
+            self.x = self.left + position
+            self.direction = 1
+        else:
+            self.x = self.right - (position - span)
+            self.direction = -1
 
     def draw(self):
         image = self.load_shared_image()
