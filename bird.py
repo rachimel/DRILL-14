@@ -16,6 +16,19 @@ DRAW_WIDTH = 90
 DRAW_HEIGHT = DRAW_WIDTH * 169 / 184
 
 
+# 원본의 위쪽 행부터 왼쪽→오른쪽. 빈 마지막 칸은 제외한다.
+# Pico2D의 잘림 y는 이미지 아래쪽에서 센다.
+COLUMN_EDGES = (0, 183, 366, 549, 732, 918)
+ROW_EDGES = (0, 168, 337, 506)
+FRAME_RECTS = tuple(
+    (COLUMN_EDGES[column], 506 - ROW_EDGES[row + 1],
+     COLUMN_EDGES[column + 1] - COLUMN_EDGES[column],
+     ROW_EDGES[row + 1] - ROW_EDGES[row])
+    for row in range(3)
+    for column in range(5 if row < 2 else 4)
+)
+
+
 class Bird:
     image = None
 
