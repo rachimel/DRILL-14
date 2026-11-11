@@ -12,6 +12,10 @@ FLY_SPEED_KMPH = 45.0
 FLY_SPEED_MPM = FLY_SPEED_KMPH * 1000 / 60
 FLY_SPEED_MPS = FLY_SPEED_MPM / 60
 FLY_SPEED_PPS = FLY_SPEED_MPS * PIXEL_PER_METER
+FRAMES_PER_FLAP = 14
+TIME_PER_FLAP = 1.0
+FLAPS_PER_SECOND = 1 / TIME_PER_FLAP
+FLY_FRAMES_PER_SECOND = FRAMES_PER_FLAP * FLAPS_PER_SECOND
 DRAW_WIDTH = 90
 DRAW_HEIGHT = DRAW_WIDTH * 169 / 184
 
@@ -38,7 +42,7 @@ class Bird:
         self.base_y = float(y)
         self.y = self.base_y
         self.direction = direction
-        self.frame = float(frame)
+        self.frame = float(frame) % FRAMES_PER_FLAP
         self.left = DRAW_WIDTH / 2
         self.right = canvas_width - DRAW_WIDTH / 2
         if self.right <= self.left:
@@ -74,6 +78,10 @@ class Bird:
         else:
             self.x = self.right - (position - span)
             self.direction = -1
+
+        self.frame = (self.frame + FLY_FRAMES_PER_SECOND * dt) % FRAMES_PER_FLAP
+        if isclose(self.frame, FRAMES_PER_FLAP, rel_tol=0, abs_tol=1e-10):
+            self.frame = 0.0
 
     def draw(self):
         image = self.load_shared_image()
