@@ -16,6 +16,10 @@ FRAMES_PER_FLAP = 14
 TIME_PER_FLAP = 1.0
 FLAPS_PER_SECOND = 1 / TIME_PER_FLAP
 FLY_FRAMES_PER_SECOND = FRAMES_PER_FLAP * FLAPS_PER_SECOND
+BOB_HEIGHT_METER = 0.15  # 최저점부터 최고점까지의 높이 차이
+BOB_HEIGHT_PIXEL = BOB_HEIGHT_METER * PIXEL_PER_METER
+RISE_START_FRAME = 4.0  # 사람이 세는 5번째 프레임
+FALL_START_FRAME = 10.0  # 사람이 세는 11번째 프레임
 DRAW_WIDTH = 90
 DRAW_HEIGHT = DRAW_WIDTH * 169 / 184
 
@@ -33,6 +37,16 @@ FRAME_RECTS = tuple(
 )
 
 
+def height_offset(frame):
+    """5번째부터 상승, 11번째부터 하강하는 연속적인 높이."""
+    phase = (frame - RISE_START_FRAME) % FRAMES_PER_FLAP
+    rise_frames = FALL_START_FRAME - RISE_START_FRAME
+    if phase < rise_frames:
+        return BOB_HEIGHT_PIXEL * phase / rise_frames
+    fall_frames = FRAMES_PER_FLAP - rise_frames
+    return BOB_HEIGHT_PIXEL * (FRAMES_PER_FLAP - phase) / fall_frames
+
+
 class Bird:
     image = None
 
@@ -43,6 +57,11 @@ class Bird:
         self.y = self.base_y
         self.direction = direction
         self.frame = float(frame) % FRAMES_PER_FLAP
+        if not isfinite(self.frame):
+            raise ValueError('초기 프레임은 유한해야 한다.')
+        if not DRAW_HEIGHT / 2 <= self.base_y <= canvas_height - DRAW_HEIGHT / 2 - BOB_HEIGHT_PIXEL:
+            raise ValueError('상하 이동을 포함한 초기 높이를 확인해야 한다.')
+        self.y = self.base_y + height_offset(self.frame)
         self.left = DRAW_WIDTH / 2
         self.right = canvas_width - DRAW_WIDTH / 2
         if self.right <= self.left:
@@ -82,6 +101,7 @@ class Bird:
         self.frame = (self.frame + FLY_FRAMES_PER_SECOND * dt) % FRAMES_PER_FLAP
         if isclose(self.frame, FRAMES_PER_FLAP, rel_tol=0, abs_tol=1e-10):
             self.frame = 0.0
+        self.y = self.base_y + height_offset(self.frame)
 
     def draw(self):
         image = self.load_shared_image()
