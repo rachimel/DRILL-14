@@ -3,7 +3,7 @@ import game_world
 import game_framework
 from boy import Boy
 from grass import Grass
-from bird import Bird, BIRD_COUNT
+from bird import Bird, BIRD_COUNT, DRAW_WIDTH, FRAMES_PER_FLAP
 
 boy = None
 birds = []
@@ -29,8 +29,16 @@ def init():
     boy = Boy()
     game_world.add_oject(boy)
 
-    birds = [Bird(x=100 + i * 140, y=240 + (i % 3) * 100)
-             for i in range(BIRD_COUNT)]
+    canvas_width = get_canvas_width()
+    canvas_height = get_canvas_height()
+    birds = [
+        Bird(x=DRAW_WIDTH / 2 + (canvas_width - DRAW_WIDTH) * (i + 0.5) / BIRD_COUNT,
+             y=canvas_height * (0.38 + 0.12 * (i % 4)),
+             direction=1 if i % 2 == 0 else -1,
+             frame=FRAMES_PER_FLAP * i / BIRD_COUNT,
+             canvas_width=canvas_width, canvas_height=canvas_height)
+        for i in range(BIRD_COUNT)
+    ]
     for bird in birds:
         game_world.add_oject(bird)
 
