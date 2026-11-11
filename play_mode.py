@@ -3,8 +3,10 @@ import game_world
 import game_framework
 from boy import Boy
 from grass import Grass
+from bird import Bird, BIRD_COUNT
 
 boy = None
+birds = []
 
 
 def handle_events():
@@ -22,10 +24,15 @@ def handle_events():
 
 
 def init():
-    global boy
+    global boy, birds
 
     boy = Boy()
     game_world.add_oject(boy)
+
+    birds = [Bird(x=100 + i * 140, y=240 + (i % 3) * 100)
+             for i in range(BIRD_COUNT)]
+    for bird in birds:
+        game_world.add_oject(bird)
 
     grass = Grass()
     game_world.add_oject(grass, 0)
@@ -40,9 +47,10 @@ def resume():
 
 
 def finish():
-    global boy
+    global boy, birds
     game_world.clear()
     boy = None
+birds = []
 
 
 def update():
