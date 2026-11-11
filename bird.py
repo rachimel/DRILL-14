@@ -55,6 +55,13 @@ class Bird:
         if dt == 0:
             return
         self.x += self.direction * FLY_SPEED_PPS * dt
+        while self.x < self.left or self.x > self.right:
+            if self.x > self.right:
+                self.x = 2 * self.right - self.x
+                self.direction = -1
+            elif self.x < self.left:
+                self.x = 2 * self.left - self.x
+                self.direction = 1
 
     def draw(self):
         image = self.load_shared_image()
