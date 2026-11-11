@@ -47,3 +47,11 @@ class Bird:
         if cls.image is None:
             cls.image = load_image(str(Path(__file__).with_name('bird_animation.png')))
         return cls.image
+
+    def update(self):
+        pass
+
+    def draw(self):
+        image = self.load_shared_image()
+        rect = FRAME_RECTS[int(self.frame)]
+        image.clip_draw(*rect, self.x, self.y, DRAW_WIDTH, DRAW_HEIGHT)
